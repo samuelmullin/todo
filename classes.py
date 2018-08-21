@@ -9,7 +9,7 @@ class ToDoSession():
             'A': {
                 'text': 'Add an Item',
                 'action': self.add_item,
-                'input_text': 'Enter new Item Text: '
+                'input_text': 'Enter Item Priority(>0): '
             },
             'R': {
                 'text': 'Remove an Item',
@@ -24,7 +24,7 @@ class ToDoSession():
         }
 
     def print_menu(self, blank=False):
-        clear = os.system('clear')  # NOQA
+        clear = os.system('clear')  # NOQA - Du
         self.todolist.print_list()
 
         if blank:
@@ -49,8 +49,22 @@ class ToDoSession():
             )
         return selection
 
-    def add_item(self, input):
-        self.todolist.add_item(input)
+    def add_item(self, priority):
+        input_error = True
+
+        while input_error:
+            try:
+                priority = int(priority)
+            except ValueError:
+                priority = -1
+
+            if priority < 0:
+                priority = input('\r' + self.menu_options['A']['input_text'])
+            else:
+                input_error = False
+
+        text = input("Please Enter the Item Text: ")
+        self.todolist.add_item(priority, text)
 
     def remove_item(self, input):
         self.todolist.remove_item(input)
@@ -61,10 +75,24 @@ class ToDoList():
     """
     def __init__(self, title=None):
         self.items = []
+        self.priorities = {}
         self.title = title or ''
+        self.max_priority = 0
 
-    def add_item(self, text):
-        self.items.append(text)
+    def add_item(self, priority, text):
+        self.items.append({
+            'text': text,
+            'priority': priority
+        })
+        if priority in self.priorities:
+            self.priorities[priority] += 1
+        else:
+            self.priorities[priority] = 1
+
+        if priority > self.max_priority:
+            for index in range(self.max_priority + 1, priority):
+                self.priorities[index] = 0
+            self.max_priority = priority
 
     def remove_item(self, key):
         # Cast key to int as input comes as str
@@ -76,14 +104,29 @@ class ToDoList():
         # Make sure it's larger than -1 so you don't accidentally delete the last
         # item in the list.
         if -1 < key < len(self.items):
+            priority = self.items[key]['priority']
+            self.priorities[priority] -= 1
             del(self.items[key])
 
     def print_list(self):
         print('~~ {} ~~'.format(self.title if self.title else 'ToDo List'))
         print('---------------')
+        missing_priorities = []
+        for key, value in self.priorities.items():
+            if value > 1:
+                print('{} - {} '.format(key, value))
+            elif value == 0:
+                missing_priorities.append(str(key))
+        if missing_priorities:
+            print('(Missing Priorities: {})'.format(', '.join(missing_priorities)))
+        print('---------------')
         if self.items:
             for index, item in enumerate(self.items):
-                print('{}: {}'.format(index + 1, item))
+                print('{index}: {priority} - {text}'.format(
+                    index=index + 1,
+                    priority=item['priority'],
+                    text=item['text']
+                ))
         else:
             print('Your list is empty!')
         print('---------------\n')
