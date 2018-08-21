@@ -10,11 +10,13 @@ class ToDoList():
     def remove_item(self, key):
         # Cast key to int as input comes as str
         try:
-            key = int(key)
+            key = int(key) - 1
         except ValueError:
             return
 
-        if key < len(self.items):
+        # Make sure it's larger than -1 so you don't accidentally delete the last
+        # item in the list.
+        if -1 < key < len(self.items):
             del(self.items[key])
 
     def print_list(self):
@@ -22,7 +24,7 @@ class ToDoList():
         print('---------------')
         if self.items:
             for index, item in enumerate(self.items):
-                print('{}: {}'.format(index, item))
+                print('{}: {}'.format(index + 1, item))
         else:
             print('Your list is empty!')
         print('---------------\n')
