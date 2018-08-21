@@ -24,7 +24,7 @@ class ToDoSession():
         }
 
     def print_menu(self, blank=False):
-        clear = os.system('clear')  # Dump in a var so it doesn't print a 0.
+        clear = os.system('clear')  # NOQA
         self.todolist.print_list()
 
         if blank:
