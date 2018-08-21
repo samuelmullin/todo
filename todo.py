@@ -1,21 +1,13 @@
-from classes import ToDoList
-from functions import get_user_input
+from classes import ToDoSession
 
 
 def main():
     # Create empty ToDoList
-    todolist = ToDoList()
+    session = ToDoSession()
     selection = ''
 
     while selection != 'Q':
-        selection, user_input = get_user_input(todolist)
-
-        # Add or remove items as necessary
-        if selection == 'A':
-            todolist.add_item(user_input)
-        elif selection == 'R':
-            todolist.remove_item(user_input)
-
+        selection = session.get_user_input()
 
 if __name__ == "__main__":
     main()
